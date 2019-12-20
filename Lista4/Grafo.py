@@ -1,4 +1,4 @@
-class Grafo:
+class Grafo: # Grafo de números!!
   def __init__ (self, **kwargs):
     iteravel = kwargs.get("iteravel", None)
     self.ponderado = kwargs.get("ponderado", False)
@@ -295,4 +295,5 @@ class Grafo:
     string2 += ", direcionado = True" if self.direcionado else ""
     return "Grafo(iteravel = [" + string[2:] + "]" + string2 + ")"
 
-    
+grafo = Grafo(iteravel = [(0, 1), (0, 2), (2, 3), (2, 4), (3, 5), (3, 6), (3, 7), (4, 7), (4, 8), (6, 8)])
+print(grafo.buscaEmLargura())
