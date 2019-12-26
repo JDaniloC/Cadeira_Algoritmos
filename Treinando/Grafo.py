@@ -116,7 +116,7 @@ class Graph:
                 if i[0] not in selecionados:
                     self.visita(i[0], selecionados)
         
-    def dijkstra(self, origem):
+    def dijkstra(self, origem): # Ele funciona com negativos psoakops
         if self.ponderado and type(origem).__name__ == "Vertice":
             relatorios = []
             visitar = [origem]
@@ -133,12 +133,111 @@ class Graph:
                 for j in i.adjacentes:
                     if j[0] not in visitar:
                         visitar.append(j[0])    
-                    novo = pesos[i] + i.peso(j[0])
+                    novo = pesos[i] + j[1]
                     if pesos[j[0]] > novo:
                         anterior[j[0]] = i
                         pesos[j[0]] = novo
                 relatorios.append((i,anterior.copy()))
             return relatorios # Todos os passos, se devolver anterior será o resultado.
+
+    def bellmanFord(self, origem):
+        if self.ponderado and type(origem).__name__ == "Vertice":
+            relatorios = []
+            vertices = [origem] + [x for x in self.vertices if x != origem]
+            anterior = {}
+            dist = {}
+
+            for i in self.vertices:
+                anterior[i] = None
+                dist[i] = float('inf')
+            dist[origem] = 0
+            anterior[origem] = origem
+
+            i = 0
+            antigo = {}
+            while anterior != antigo:
+                antigo = anterior.copy()
+                for vertice in vertices:
+                    if anterior[vertice] != None:
+                        for aresta in vertice.adjacentes:
+                            old = dist[aresta[0]]
+                            dist[aresta[0]] = min([old, dist[vertice] + aresta[1]])
+                            if old != dist[aresta[0]]:
+                                anterior[aresta[0]] = vertice
+                if i != 0: relatorios.append((i, anterior.copy()))
+                i += 1
+            return relatorios
+
+    def prim(self, vertice):
+        if self.ponderado and type(vertice).__name__ == 'Vertice' and not self.direcionado:
+            relatorios = []
+            visitar = [vertice] # Todos os que precisam visitar.
+            arestas = []
+            pesos = {vertice:(vertice, 0, vertice)} # Resultado de todas as pesos.
+
+            for ver in visitar:
+                for aresta in ver.adjacentes:
+                    if aresta[0] not in visitar: visitar.append(aresta[0])
+            for i in visitar:
+                if i not in pesos: pesos[i] = (Vertice(), float('inf'), Vertice())
+            visitar = [vertice]
+            cont = 0
+            antigo = {}
+            while antigo != pesos:
+                antigo = pesos.copy()
+                for j in range(cont, len(visitar)): # Adiciona novas arestas
+                    for i in visitar[j].adjacentes:
+                        objeto = (i[0], i[1], visitar[j])
+                        if objeto not in arestas:
+                            arestas.append(objeto)
+                    cont += 1
+                arestas = self.minimo(arestas)
+                while arestas != []:
+                    if arestas[0][1] < pesos[arestas[0][0]][1] and arestas[0][0] != pesos[arestas[0][2]][2]:
+                        pesos[arestas[0][0]] = arestas[0]
+                        if pesos[arestas[0][0]][0] not in visitar:
+                            visitar.append(pesos[arestas[0][0]][0])
+                        relatorios.append(pesos[arestas[0][0]])
+                        break
+                    arestas.pop(0)
+                    arestas = self.minimo(arestas)
+            return relatorios
+                
+    def minimo(self, lista):
+        for i in range(len(lista)):
+            if lista[i][1] < lista[0][1]:
+                lista[0], lista[i] = lista[i], lista[0]
+        return lista
+
+    def kruskal(self, vertice = None):
+        if self.ponderado and not self.direcionado:
+            relatorios = []
+            arestas = [] # Todas as arestas
+            if vertice == None: vertice = self.vertices[0]
+            vertices = [vertice]
+            pesos = {} 
+
+            # Caso for disconexo
+            for ver in vertices:
+                for aresta in ver.adjacentes:
+                    if aresta[0] not in vertices: vertices.append(aresta[0])
+
+            for i in vertices: # Pega todas as arestas
+                for j in i.adjacentes:
+                    if j + (i,) not in arestas and (i, j[1], j[0]) not in arestas:
+                        arestas.append(j + (i,))
+            
+            while len(pesos) != len(vertices) and arestas != []:
+                arestas = self.minimo(arestas)
+                menor = arestas.pop(0)
+                if menor[0] not in pesos:
+                    relatorios.append(menor)
+                    pesos[menor[0]] = menor
+                elif menor[2] not in pesos: # Vai que né...
+                    relatorios.append(menor)
+                    pesos[menor[2]] = menor
+            
+            return relatorios
 
     def isDirecionado(self): return self.direcionado
     def isPonderado(self): return self.ponderado
@@ -183,11 +282,31 @@ class Graph:
     negativo = property(getNegativo, )
 
 if __name__ == "__main__":
-    g = Graph(iteravel = [(1, 2, 6), (2, 8, 8), (8, 7, 15), (8, 12, 11), (8, 9, 11), (9, 12, 17)], ponderado = True)
-    #g = Graph(iteravel = [('a', 'b', 's'), ('s', 'c', 'g'), ('c', 'd', 'e', 'f'), ('g', 'f', 'h'), ('e', 'h')])
-    lista = g.dijkstra(g.getVertice(12))
+    """
+    g = Graph(iteravel = [("A", "B", 2), ("A", "C", 3), ("A", "D", 3), ("B", "C", 4), ("B", "E", 3), ("C", "D", 5), ("C", "E", 1), ("D", "F", 7), ("E", "F", 8), ("F", "G", 9)], ponderado = True)
+    menores = g.kruskal()
+    for i in menores:
+        print(f"{i.id} -- {menores[i][2].id} com peso {menores[i][1]}")
+    """
+    """
+    g = Graph(iteravel = [("A", "B", 2), ("A", "C", 3), ("A", "D", 3), ("B", "C", 4), ("B", "E", 3), ("C", "D", 5), ("C", "E", 1), ("C", "F", 6) ("D", "F", 7), ("E", "F", 8), ("F", "G", 9)], ponderado = True)
+    relatorio = g.prim(g.getVertice("A"))
+    for i in relatorio:
+        print(i)"""
+    """
+    g = Graph(iteravel = [(1, 2, -6), (2, 8, 8), (8, 7, 15), (8, 12, 11), (8, 9, 11), (2, 22, 1), (22, 1, 0)], ponderado = True, direcionado = True)
+    lista = g.dijkstra(g.getVertice(1))
     for tuplas in lista:
         print(f"When was {tuplas[0].id}")
         dic = tuplas[1]
         for i in tuplas[1]:
             print(f"{i.id} : {dic[i] if dic[i] == None else dic[i].id}")
+    
+    print("\nBELLMAN\n")
+    lista = g.bellmanFord(g.getVertice(1))
+    for tuplas in lista:
+        print(f"When was {tuplas[0]}")
+        dic = tuplas[1]
+        for i in tuplas[1]:
+            print(f"{i.id} : {dic[i] if dic[i] == None else dic[i].id}")
+    """
