@@ -74,15 +74,15 @@ class Grafo:
             if self.estaEm((event.x, event.y), x):
                 if not self.select:
                     self.select = self.grafo.locals[x]
-                    self.grafo.select(self.select)
+                    self.grafo.paint(self.select, 'green')
                 else:
                     self.add(self.select, self.grafo.locals[x])
-                    self.grafo.unselect(self.select)
+                    self.grafo.paint(self.select)
                     self.select = False
                 ver = True
         if not ver:
             if self.select:
-                self.grafo.unselect(self.select)
+                self.grafo.paint(self.select)
                 self.select = False
             if event.x <=self.tela.winfo_width() - 20 and event.y <= self.tela.winfo_height() - 20:
                 self.criar(str(self.contador), (event.x, event.y))
@@ -172,8 +172,9 @@ class Grafo:
             messagebox.showerror("ERROR", "O grafo não pode ser direcionado e deve ser ponderado!")
     
     def delete(self):
-        self.contador = 0
+        self.contador = 0 # Não tá resetando e tá demorando...
         self.grafo.delete()
+        messagebox.showinfo("Sorry", "Tenha paciência...")
 
     def ajuda(self):
         messagebox.showinfo("AJUDA", 
@@ -273,45 +274,45 @@ class Vertices:
             Label(frame, text = f'Etapa {etapas[i]}').grid(row = 0, column = i+1)
         coluna = 0
         for tuplas in lista:
-            if escolha == 'dijkstra': self.select(tuplas[0].id)
+            if escolha == 'dijkstra': self.paint(tuplas[0].id, 'green')
             sleep(0.5) # PAUSA
             dic = tuplas[1]
             linha = 0
             for i in tuplas[1]:
                 if dic[i] != None:
                     tabela[linha][coluna]['text'] = str(dic[i].id)
+                    self.paint(i.id, 'yellow')
+                    self.paint(dic[i].id, 'yellow')
+                    sleep(0.5) # PAUSA
                     self.paint(i.id)
                     self.paint(dic[i].id)
-                    sleep(0.5) # PAUSA
-                    self.unselect(i.id)
-                    self.unselect(dic[i].id)
                 else:
                     if linha < len(tabela) and coluna < len(tabela[0]):
                         tabela[linha][coluna]['text'] = "NULL"
-                    self.black(i.id)
+                    self.paint(i.id, 'black')
                     sleep(0.5) # PAUSA
-                    self.unselect(i.id)
+                    self.paint(i.id)
                 linha += 1
-            if escolha == 'dijkstra': self.unselect(tuplas[0].id)
+            if escolha == 'dijkstra': self.paint(tuplas[0].id)
             coluna += 1
 
     def path(self, tabela, i, j, chaves):
         lista = []
         chaves = [x.id for x in chaves]
-        self.paint(chaves[i])
+        self.paint(chaves[i], 'yellow')
         lista.append(chaves[i])
         escolhido = tabela[i][j]['text']
         if escolhido != 'NULL':
             while chaves[i] != tabela[i][j]['text']:
-                self.paint(escolhido)
+                self.paint(escolhido, 'yellow')
                 lista.append(escolhido)
                 i = chaves.index(escolhido)
                 escolhido = tabela[i][j]['text']
                 sleep(0.2) # PAUSA
-            self.paint(tabela[i][j]['text'])
+            self.paint(tabela[i][j]['text'], 'yellow')
         sleep(1) # PAUSA
         for i in lista:
-            self.unselect(i)
+            self.paint(i)
 
     def prim(self, vertice):
         relatorio = self.grafo.prim(self.grafo[vertice])
@@ -354,21 +355,8 @@ class Vertices:
         else:
             self.grafo = Graph(ponderado = True, direcionado = True)
 
-    # Passar como parâmetro a cor!!
-    def select(self, id): 
-        self.tela.itemconfig(self.lista[id][0], fill = 'green')
-        self.janela.update()
-        self.janela.update_idletasks()
-    def unselect(self, id): 
-        self.tela.itemconfig(self.lista[id][0], fill = 'white')
-        self.janela.update()
-        self.janela.update_idletasks()
-    def paint(self, id):
-        self.tela.itemconfig(self.lista[id][0], fill = 'yellow')
-        self.janela.update()
-        self.janela.update_idletasks()
-    def black(self, id):
-        self.tela.itemconfig(self.lista[id][0], fill = 'black')
+    def paint(self, id, color = 'white'):
+        self.tela.itemconfig(self.lista[id][0], fill = color)
         self.janela.update()
         self.janela.update_idletasks()
     def arestaPaint(self, id, color = 'black'):
