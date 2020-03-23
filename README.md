@@ -1,13 +1,13 @@
 # Cadeira Algoritmos 2019.2
 Códigos da cadeira de algorítmos.
 
-<img style = 'border-style:groove' src='./static/main.png'/>
+<img src='./static/main.png'/>
 
 - Lista 1
 
 > Cronometro: Objeto para a compreensão de POO, do qual armazena informação e interage com o usuário através de métodos como ligar, desligar, parar e zerar.
 
-<img style='float: right; width: 20%; border-style:groove' src='./static/config.png'/>
+<img align= right width= 15% src='./static/config.png'/>
 
 - Lista 2
 
@@ -19,7 +19,7 @@ Códigos da cadeira de algorítmos.
 
 > Hash e aleatorio: Uma tentativa de criação de uma tabela Hash e um gerador de "pessoas".
 
-<img style='float: right; width: 30%; border-style:groove' src='./static/prim.png'/>
+<img align= right width= 20% src='./static/prim.png'/>
 
 - Lista 4
 
@@ -33,7 +33,7 @@ Códigos da cadeira de algorítmos.
 
 > Um programinha simples para os novatos da cadeira de algorítmos, onde tenta recriar de forma visual os algorítmos de busca, árvore geradora, caminho mínimo em grafos: BFS, DFS, Kruskal, Prim, Dijkstra, Bellman F.
 
-<img style = 'width: 100%; border-style:groove' src='./static/dijs.png'/>
+<img width = 100% src='./static/dijs.png'/>
 
 ## Contribuidores e contato
 
